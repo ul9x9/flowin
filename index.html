@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة فلوين | أرشيف الكرتون الأسطوري</title>
+    <style>
+        :root {
+            --bg-color: #08090c;
+            --container-bg: #131722;
+            --accent-color: #00ffcc;
+            --text-color: #a0a5b5;
+            --text-white: #ffffff;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+        }
+        header {
+            background-color: #0f121a;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        .logo { font-size: 28px; font-weight: bold; color: var(--text-white); letter-spacing: 1px; }
+        .logo span { color: var(--accent-color); }
+        
+        .main-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        h2 { color: var(--text-white); border-right: 4px solid var(--accent-color); padding-right: 10px; margin-top: 40px; }
+        
+        /* مشغل الفيديو المدمج */
+        .player-wrapper {
+            background: var(--container-bg); border-radius: 12px; padding: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6); border: 1px solid #1e2538;
+        }
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000;
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .controls-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
+        .btn-mode {
+            background: #08090c; color: var(--text-white); border: 1px solid var(--accent-color);
+            padding: 8px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .btn-mode:hover { background: var(--accent-color); color: #000; }
+
+        /* قائمة المواسم والحلقات */
+        .episodes-section { margin-top: 20px; background: var(--container-bg); padding: 15px; border-radius: 8px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: #1e2538; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+        .tab-btn.active { background: var(--accent-color); color: #000; font-weight: bold; }
+        .episodes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+        .ep-btn { background: #08090c; color: #fff; border: 1px solid #1e2538; padding: 10px; border-radius: 4px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .ep-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+
+        /* شبكة عرض المسلسلات */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin-top: 20px; }
+        .card { background: var(--container-bg); border-radius: 10px; overflow: hidden; transition: 0.3s; cursor: pointer; border: 1px solid #1e2538; }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent-color); box-shadow: 0 5px 15px rgba(0,255,204,0.2); }
+        .card img { width: 100%; height: 280px; object-fit: cover; }
+        .card-details { padding: 15px; }
+        .card-title { color: var(--text-white); font-weight: bold; font-size: 17px; margin-bottom: 5px; }
+        .card-tag { font-size: 13px; color: var(--accent-color); }
+
+        /* لوحة تحكم الأدمن المدمجة (مخفية وتظهر بكلمة سر) */
+        .admin-panel { background: #1a1f2c; padding: 25px; border-radius: 10px; margin-top: 50px; border: 2px dashed var(--accent-color); display: none; }
+        .form-group { margin-bottom: 12px; }
+        input, select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #2d3548; background: #08090c; color: #fff; box-sizing: border-box; }
+        
+        footer { text-align: center; padding: 30px; margin-top: 50px; border-top: 1px solid #1e2538; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">FLOWIN<span>.TV</span></div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span style="color: var(--accent-color); font-weight: bold;">الأرشيف الأسطوري الكامل الحلقات</span>
+            <button class="btn-mode" style="font-size:12px; padding:4px 10px;" onclick="toggleAdmin()">⚙️ لوحة الإدارة</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <!-- مشغل الفيديو المدمج في نفس الصفحة -->
+        <h2 id="view-player">منطقة المشاهدة المباشرة</h2>
+        <div class="player-wrapper">
+            <div class="video-container">
+                <!-- مشغل مدمج افتراضي (مثال لحلقة بن 10) -->
+                <iframe id="mainPlayer" src="https://ok.ru" allowfullscreen></iframe>
+            </div>
+            <div class="controls-bar">
+                <div id="playingTitle" style="font-weight: bold; color: var(--text-white); font-size: 18px;">يعرض الآن: بن 10 إليين فورس - الموسم 1 - الحلقة 1</div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-mode" onclick="changeServer('dubbed')">🎙️ دبلجة كرتون نتورك</button>
+                    <button class="btn-mode" onclick="changeServer('subbed')">📝 نسخة مترجمة (بدون حذف)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- أزرار اختيار الحلقات للمسلسل النشط -->
+        <div class="episodes-section">
+            <div class="tabs">
+                <button class="tab-btn active">الموسم 1</button>
+                <button class="tab-btn">الموسم 2</button>
+                <button class="tab-btn">الموسم 3</button>
+            </div>
+            <div class="episodes-grid" id="episodesContainer">
+                <div class="ep-btn" onclick="playEpisode(1, '8157777177202')">الحلقة 1</div>
+                <div class="ep-btn" onclick="playEpisode(2, '8157776128594')">الحلقة 2</div>
+                <div class="ep-btn" onclick="playEpisode(3, '8157775538770')">الحلقة 3</div>
+                <div class="ep-btn" onclick="playEpisode(4, '8157774948946')">الحلقة 4</div>
+                <div class="ep-btn" onclick="playEpisode(5, '8157774162514')">الحلقة 5</div>
+            </div>
+        </div>
+
+        <!-- شبكة عرض المسلسلات الأسطورية المتاحة -->
+        <h2>المكتبة الأسطورية المرتبة</h2>
+        <div class="grid-container" id="libraryGrid">
+            
+            <!-- بن 10 -->
+            <div class="card" onclick="loadSeries('ben10')">
+                <img src="https://justwatch.com" id="img-ben10">
+                <div class="card-details">
+                    <div class="card-title" id="title-ben10">بن 10: إليين فورس</div>
+                    <div class="card-tag">كامل (46 حلقة) • دبلجة وترجمة</div>
+                </div>
+            </div>
+
+            <!-- وقت المغامرة -->
+            <div class="card" onclick="loadSeries('adventure')">
+                <img src="https://justwatch.com" id="img-adventure">
+                <div class="card-details">
+                    <div class="card-title" id="title-adventure">وقت المغامرة (Adventure Time)</div>
+                    <div class="card-tag">جميع المواسم والحلقات المحذوفة</div>
+                </div>
+            </div>
+
+            <!-- الجزيئات الآلية -->
+            <div class="card" onclick="loadSeries('rex')">
+                <img src="https://media-amazon.com" id="img-rex">
+                <div class="card-details">
+                    <div class="card-title" id="title-rex">الجزيئات الآلية (Generator Rex)</div>
+                    <div class="card-tag">كامل الأجزاء • دقة عالية</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- لوحة الإدارة للتعديل السريع -->
+        <div class="admin-panel" id="adminPanel">
+            <h3 style="color: var(--accent-color); margin-top:0;">🛠️ لوحة تحكم المالك (فلوين)</h3>
+            <div class="form-group">
+                <label style="color:#fff;">اختر المسلسل المراد تعديله:</label>
+                <select id="selectSeries">
+                    <option value="ben10">بن 10: إليين فورس</option>
+                    <option value="adventure">وقت المغامرة</option>
+                    <option value="rex">الجزيئات الآلية</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="color:#fff;">تعديل الاسم المعروض للمسلسل:</label>
+                <input type="text" id="newTitle" placeholder="الاسم الجديد...">
+            </div>
+            <div class="form-group">
+                <label style="color:#fff;">تعديل رابط الصورة المصغرة (الغلاف):</label>
+                <input type="url" id="newImg" placeholder="رابط الصورة الجديد...">
+            </div>
+            <button class="btn-mode" style="width:100%; background: var(--accent-color); color:#000;" onclick="saveAdminChanges()">تطبيق التعديلات فوراً على الموقع</button>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>حقوق النشر محفوظة لمنصة <b>FLOWIN</b> © 2026. بديل فلويند الأسطوري المفتوح.</p>
+    </footer>
+
+    <script>
+        // دالات تشغيل وتغيير الحلقات
+        let currentVideoId = "8157777177202";
+
+        function playEpisode(num, okRuId) {
+            currentVideoId = okRuId;
+            document.getElementById('mainPlayer').src = "https://ok.ru" + okRuId;
